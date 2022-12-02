@@ -1,5 +1,6 @@
 import requests
 import json
+import eventlogger as er
 
 class forecastObj:
     def __init__(self, date_time, temp, feels_like, temp_min, temp_max, pressure, humidity, weather_keyword,
@@ -51,7 +52,7 @@ def get_weather_forecast(api, lat, long):
                                         long=long))
         weather_data = json.loads(weather_forecast.content.decode('utf-8'))['list']
     except Exception as e:
-        print("Error with processing the API call for weather forecast: {}".format(e.string))
+        er.add_events("ERROR: Issue processing the API call for weather forecast: {}".format(e.string))
     try:
         for dp in weather_data:
             
@@ -67,5 +68,5 @@ def get_weather_forecast(api, lat, long):
                                     dp["wind"]["deg"], dp["wind"]["gust"], dp["clouds"]["all"], dp["visibility"], 0)
                 next_150_hours.append(pit)
     except Exception as e:
-        print("Issue converting datapoint into forecast object: {}".format(e.string))
+        er.add_events("ERROR: Issue converting datapoint into forecast object: {}".format(e.string))
     return next_150_hours
