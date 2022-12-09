@@ -16,7 +16,7 @@ def main():
     freezing_forecasted_condition = fn.have_Freezing_Conditions(forecasted_weather,config["FREEZINGCONDITIONS"]["TEMP"])
     if freezing_forecasted_condition != False:
         e.add_events("Found - We have a freezing condition coming up! Condition: {}".format(freezing_forecasted_condition))
-        for recepient in config["RECEPIENTS"]["PROD"].split(","):
+        for recepient in config["RECEPIENTS"]["FREEZEALERTS"].split(","):
             t.send_message(recepient, freezing_forecasted_condition)
     e.add_events("PROGRAM END")
     e.close_log()
