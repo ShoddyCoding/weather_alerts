@@ -18,6 +18,8 @@ def main():
         e.add_events("Found - We have a freezing condition coming up! Condition: {}".format(freezing_forecasted_condition))
         for recepient in config["RECEPIENTS"]["FREEZEALERTS"].split(","):
             t.send_message(recepient, freezing_forecasted_condition)
+    else:
+        e.add_events("INFO: No Freezing Events Found")
     e.add_events("PROGRAM END")
     e.close_log()
 

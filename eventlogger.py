@@ -12,7 +12,7 @@ def close_log():
     isExist = os.path.exists("logs")
     if not isExist:
         os.makedirs("logs")
-    filename = os.path.join(u.get_local_file_path(),"logs\\weather_alert_log_{}.txt".format(s))
+    filename = os.path.join(u.get_local_file_path(),"logs/weather_alert_log_{}.txt".format(s))
     with open(filename, 'a+') as file:
             file.write(u.log_events)
     
