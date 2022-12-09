@@ -13,8 +13,11 @@ def main():
     forecasted_weather = fn.get_weather_forecast(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
     #fn.get_air_pollution(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
     #fn.get_current_weather(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
-    if fn.have_Freezing_Conditions(forecasted_weather,config["FREEZINGCONDITIONS"]["TEMP"]) != False:
-        e.add_events("Found - We have a freezing condition coming up!")
+    freezing_forecasted_condition = fn.have_Freezing_Conditions(forecasted_weather,config["FREEZINGCONDITIONS"]["TEMP"])
+    if freezing_forecasted_condition != False:
+        e.add_events("Found - We have a freezing condition coming up! Condition: {}".format(freezing_forecasted_condition))
+        for recepient in config["RECEPIENTS"]["PROD"].split(","):
+            t.send_message(recepient, freezing_forecasted_condition)
     e.add_events("PROGRAM END")
     e.close_log()
 

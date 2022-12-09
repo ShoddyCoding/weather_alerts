@@ -90,7 +90,7 @@ def have_Freezing_Conditions(forecast, temperature):
                 listOfDetections.append(detection)
         earlist_freezing_temp = find_lowest_value_in_forecast_condition(listOfDetections)
         if (datetime.datetime.fromtimestamp(earlist_freezing_temp.dt) - now_dt).days == 0:
-            return earlist_freezing_temp.dt
+            return format_weather_message(earlist_freezing_temp)
         else:
             return False
     except Exception as e:
@@ -109,3 +109,11 @@ def find_lowest_value_in_forecast_condition(list):
         er.add_events("ERROR: Issue with finding the lowest value in a list: {}".format(e.string))
         return False
         
+def format_weather_message(weather_obj):
+    """Takes a weather object and returns string of descriptive weather conditions"""
+    try:
+        time = datetime.datetime.fromtimestamp(weather_obj.dt)
+        weather_string = "Freezing Conditions coming up at: {0}, temp: {1}, conditions: {2}".format(time, weather_obj.t, weather_obj.wd)
+        return weather_string
+    except Exception as e:
+        er.add_events("ERROR: Unable to convert weather object to string: {}".format(e.string))
