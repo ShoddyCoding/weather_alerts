@@ -82,13 +82,17 @@ def have_Freezing_Conditions(forecast, temperature):
     """Takes a list of 150 hours of forecast objects and evaluates for freezing conditions
      in the next 6 hours and returns a detection object if condition is found"""
     listOfDetections = []
+    now_dt = datetime.datetime.now()
     try:
         for i in forecast:
             if i.t < temperature:
                 detection = detectionOjb(i.dt, i.t, i.wk, i.wd)
                 listOfDetections.append(detection)
         earlist_freezing_temp = find_lowest_value_in_forecast_condition(listOfDetections)
-        return earlist_freezing_temp.dt
+        if (datetime.datetime.fromtimestamp(earlist_freezing_temp.dt) - now_dt).days == 0:
+            return earlist_freezing_temp.dt
+        else:
+            return False
     except Exception as e:
         er.add_events("ERROR: Issue with adding a parsing or adding a detection: {}".format(e.string))
         return False
@@ -96,16 +100,11 @@ def have_Freezing_Conditions(forecast, temperature):
 def find_lowest_value_in_forecast_condition(list):
     """finds the lowest valued object based on the time and within 24 hours"""
     lowest_value_object = detectionOjb(26473669201,5000,'Clear','Probably Hot')
-    now_dt = datetime.datetime.now()
     try:
         for i in list:
             if i.dt < lowest_value_object.dt:
                 lowest_value_object = i
-        lowest_value_dt = datetime.datetime.fromtimestamp(lowest_value_object.dt)
-        if (lowest_value_dt - now_dt).days == 0:
-            return lowest_value_object
-        else:
-            return False
+        return lowest_value_object
     except Exception as e:
         er.add_events("ERROR: Issue with finding the lowest value in a list: {}".format(e.string))
         return False
