@@ -9,7 +9,4 @@ Ideally aiming to fire alerts for the following circumstances:
 4. Store Data of Current Weather for Further Visualization
 5. Find good candidates for days with good bee inspection weather
 
-Need to hook into texting alert system
-Need to hook into email
-
 Using the Open Weather API
