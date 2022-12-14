@@ -80,7 +80,7 @@ def get_weather_forecast(api, lat, long):
 
 def have_Freezing_Conditions(forecast, temperature):
     """Takes a list of 150 hours of forecast objects and evaluates for freezing conditions
-     in the next 6 hours and returns a detection object if condition is found"""
+     in the next 24 hours and returns a detection object if condition is found"""
     listOfDetections = []
     now_dt = datetime.datetime.now()
     try:
@@ -100,7 +100,7 @@ def have_Freezing_Conditions(forecast, temperature):
         return False
 
 def find_lowest_value_in_forecast_condition(list):
-    """finds the lowest valued object based on the time and within 24 hours"""
+    """finds the lowest valued object in list based on the time"""
     lowest_value_object = detectionOjb(26473669201,5000,'Clear','Probably Hot')
     try:
         for i in list:
