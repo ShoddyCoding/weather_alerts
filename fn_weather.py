@@ -90,7 +90,9 @@ def have_Freezing_Conditions(forecast, temperature):
                 listOfDetections.append(detection)
         earlist_freezing_temp = find_lowest_value_in_forecast_condition(listOfDetections)
         if (datetime.datetime.fromtimestamp(earlist_freezing_temp.dt) - now_dt).days == 0:
-            return format_weather_message(earlist_freezing_temp)
+            first_thaw_after_freeze = find_first_nonfreezing_condition(earlist_freezing_temp, forecast)
+            formatted_message = format_weather_message(earlist_freezing_temp, first_thaw_after_freeze)
+            return formatted_message
         else:
             return False
     except Exception as e:
@@ -108,12 +110,30 @@ def find_lowest_value_in_forecast_condition(list):
     except Exception as e:
         er.add_events("ERROR: Issue with finding the lowest value in a list: {}".format(e.string))
         return False
+
+def find_first_nonfreezing_condition(earliest_freeze, weather_objs):
+    """Finds the first nonfreezing condition that occurs after a freeze and returns that weather object"""
+    first_thaw = detectionOjb(26473669201,5000,'Clear','Probably Hot')
+    try:
+        for i in weather_objs:
+            if i.dt > earliest_freeze.dt and first_thaw.t > 42 and i.dt < first_thaw.dt:
+                first_thaw = i
+        if first_thaw != detectionOjb(26473669201,5000,'Clear','Probably Hot'):
+            return first_thaw
+        else:
+            return False
+    except Exception as e:
+        er.add_events("ERROR: Issue with finding the first thaw: {}".format(e.string))
+        return False
         
-def format_weather_message(weather_obj):
-    """Takes a weather object and returns string of descriptive weather conditions"""
+def format_weather_message(weather_obj, first_thaw):
+    """Takes weather objects and returns string of descriptive weather conditions"""
     try:
         time = datetime.datetime.fromtimestamp(weather_obj.dt)
-        weather_string = "Freezing Conditions coming up at: {0}, temp: {1}, conditions: {2}".format(time, weather_obj.t, weather_obj.wd)
+        first_thaw = datetime.datetime.fromtimestamp(first_thaw.dt)
+        weather_string = "Freezing Conditions coming up at:" \
+            " {0}, temp: {1}, conditions: {2} Expected end at: {3}"\
+                .format(time, weather_obj.t, weather_obj.wd, first_thaw)
         return weather_string
     except Exception as e:
         er.add_events("ERROR: Unable to convert weather object to string: {}".format(e.string))
