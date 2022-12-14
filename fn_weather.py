@@ -130,10 +130,13 @@ def format_weather_message(weather_obj, first_thaw):
     """Takes weather objects and returns string of descriptive weather conditions"""
     try:
         time = datetime.datetime.fromtimestamp(weather_obj.dt)
-        first_thaw = datetime.datetime.fromtimestamp(first_thaw.dt)
+        if first_thaw != False:
+            first_thaw_time = datetime.datetime.fromtimestamp(first_thaw.dt)
+        else:
+            first_thaw_time = "Unknown, this is a long freeze"
         weather_string = "Freezing Conditions coming up at:" \
             " {0}, temp: {1}, conditions: {2} Expected end at: {3}"\
-                .format(time, weather_obj.t, weather_obj.wd, first_thaw)
+                .format(time, weather_obj.t, weather_obj.wd, first_thaw_time)
         return weather_string
     except Exception as e:
         er.add_events("ERROR: Unable to convert weather object to string: {}".format(e.string))
