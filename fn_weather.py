@@ -135,7 +135,7 @@ def format_weather_message(weather_obj, first_thaw):
         else:
             first_thaw_time = "Unknown, this is a long freeze"
         weather_string = "Freezing Conditions coming up at:" \
-            " {0}, temp: {1}, conditions: {2} Expected end at: {3}"\
+            " {0}, temp: {1}, conditions: {2} \n Expected end at: {3}"\
                 .format(time, weather_obj.t, weather_obj.wd, first_thaw_time)
         return weather_string
     except Exception as e:
