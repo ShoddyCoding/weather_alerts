@@ -15,7 +15,7 @@ def main():
     #fn.get_current_weather(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
     freezing_forecasted_condition = fn.have_Freezing_Conditions(forecasted_weather,config["FREEZINGCONDITIONS"]["TEMP"])
     #heartbeat
-    t.send_message(config["RECEPIENTS"]["TEST"], "I'm Still Alive!")
+    #t.send_message(config["RECEPIENTS"]["TEST"], "I'm Still Alive!")
     if freezing_forecasted_condition != False:
         e.add_events("Found - We have a freezing condition coming up! Condition: {}".format(freezing_forecasted_condition))
         for recepient in config["RECEPIENTS"]["FREEZEALERTS"].split(","):
