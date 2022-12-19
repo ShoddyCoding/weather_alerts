@@ -116,7 +116,7 @@ def find_first_nonfreezing_condition(earliest_freeze, weather_objs):
     first_thaw = detectionOjb(26473669201,5000,'Clear','Probably Hot')
     try:
         for i in weather_objs:
-            if i.dt > earliest_freeze.dt and first_thaw.t > 42 and i.dt < first_thaw.dt:
+            if i.dt > earliest_freeze.dt and i.t > 42 and i.dt < first_thaw.dt:
                 first_thaw = i
         if first_thaw != detectionOjb(26473669201,5000,'Clear','Probably Hot'):
             return first_thaw
