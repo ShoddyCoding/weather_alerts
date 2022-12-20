@@ -3,6 +3,7 @@ import utilities as u
 import eventlogger as e
 import texting as t
 import os
+import dbconnections as db
 
 
 def main():
@@ -10,6 +11,8 @@ def main():
     e.add_events("PROGRAM START")
     __location__ = u.get_local_file_path()
     config = u.read_json(os.path.join(__location__, 'config.json'))
+    db.setupdbs(config["MYSQL"]["HOSTNAME"],config["MYSQL"]["PORT"]
+            ,config["MYSQL"]["WEATHER_USERNAME"],config["MYSQL"]["WEATHER_PASS"])
     forecasted_weather = fn.get_weather_forecast(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
     #fn.get_air_pollution(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
     #fn.get_current_weather(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
@@ -22,5 +25,6 @@ def main():
         e.add_events("INFO: No Freezing Events Found")
     e.add_events("PROGRAM END")
     e.close_log()
+    db.close_dbs()
 
 main()
