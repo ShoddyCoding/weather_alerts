@@ -129,7 +129,7 @@ def get_weather_forecast(api, lat, long):
                     `temp_max`, `pressure`, `humidity`, `weather_keyword`, `weather_description`, `wind_speed`, \
                     `wind_direction`, `clouds`, `visibility`) \
                     VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}',\
-                    '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}') \
+                    '{7}', '{8}', '{9}', '{10}', '{11}', '{12}') \
                     ON DUPLICATE KEY UPDATE `temp` = '{1}', `feel_like` = '{2}', `temp_min` = '{3}', \
                     `temp_max` = '{4}', `pressure` = '{5}', `humidity` = '{6}', `weather_keyword` = '{7}', \
                     `weather_description`= '{8}', `wind_speed` = '{9}', `wind_direction` = '{10}',\
