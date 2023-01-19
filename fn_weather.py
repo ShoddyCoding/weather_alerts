@@ -108,11 +108,35 @@ def get_weather_forecast(api, lat, long):
                                     dp["main"]["temp_max"],  dp["main"]["pressure"], dp["main"]["humidity"],
                                     dp["weather"][0]["main"], dp["weather"][0]["description"],dp["wind"]["speed"],
                                     dp["wind"]["deg"], dp["wind"]["gust"], dp["clouds"]["all"], dp["visibility"], dp["rain"]["3h"])
+                    query = "INSERT INTO `weather`.`weather_forecast` (`dt`, `temp`, `feel_like`, `temp_min`, \
+                    `temp_max`, `pressure`, `humidity`, `weather_keyword`, `weather_description`, `wind_speed`, \
+                    `wind_direction`, `clouds`, `visibility`, `rain`) \
+                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}',\
+                    '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}') \
+                    ON DUPLICATE KEY UPDATE `temp` = '{1}', `feel_like` = '{2}', `temp_min` = '{3}', \
+                    `temp_max` = '{4}', `pressure` = '{5}', `humidity` = '{6}', `weather_keyword` = '{7}', \
+                    `weather_description`= '{8}', `wind_speed` = '{9}', `wind_direction` = '{10}',\
+                    `clouds` = '{11}', `visibility`= '{12}', `rain` = '{13}';".format(pit.dt, pit.t, pit.fl, 
+                    pit.tmin, pit.tmax, pit.p, pit.h, pit.wk, pit.wd, pit.w_s, pit.w_d, pit.c, pit.v, pit.r)          
+                    db.conn_local_prod_cursor.execute(query)
+                    er.add_events("ADDED - FUTURE WEATHER FORECAST WITH RAIN")
                 else:
                     pit = forecastObj(dp["dt"], dp["main"]["temp"], dp["main"]["feels_like"], dp["main"]["temp_min"],
                                     dp["main"]["temp_max"],  dp["main"]["pressure"], dp["main"]["humidity"],
                                     dp["weather"][0]["main"], dp["weather"][0]["description"],dp["wind"]["speed"],
                                     dp["wind"]["deg"], dp["wind"]["gust"], dp["clouds"]["all"], dp["visibility"], 0)
+                    query = "INSERT INTO `weather`.`weather_forecast` (`dt`, `temp`, `feel_like`, `temp_min`, \
+                    `temp_max`, `pressure`, `humidity`, `weather_keyword`, `weather_description`, `wind_speed`, \
+                    `wind_direction`, `clouds`, `visibility`) \
+                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}',\
+                    '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}') \
+                    ON DUPLICATE KEY UPDATE `temp` = '{1}', `feel_like` = '{2}', `temp_min` = '{3}', \
+                    `temp_max` = '{4}', `pressure` = '{5}', `humidity` = '{6}', `weather_keyword` = '{7}', \
+                    `weather_description`= '{8}', `wind_speed` = '{9}', `wind_direction` = '{10}',\
+                    `clouds` = '{11}', `visibility`= '{12}';".format(pit.dt, pit.t, pit.fl, 
+                    pit.tmin, pit.tmax, pit.p, pit.h, pit.wk, pit.wd, pit.w_s, pit.w_d, pit.c, pit.v)          
+                    db.conn_local_prod_cursor.execute(query)
+                    er.add_events("ADDED - FUTURE WEATHER FORECAST WITHOUT RAIN")
                 next_150_hours.append(pit)
     except Exception as e:
         er.add_events("ERROR: Issue converting datapoint into forecast object: {}".format(e.string))
