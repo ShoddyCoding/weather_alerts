@@ -13,8 +13,10 @@ def main():
     config = u.read_json(os.path.join(__location__, 'config.json'))
     db.setupdbs(config["MYSQL"]["HOSTNAME"],config["MYSQL"]["PORT"]
             ,config["MYSQL"]["WEATHER_USERNAME"],config["MYSQL"]["WEATHER_PASS"])
-    fn.get_air_pollution(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
-    fn.get_current_weather(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
+    ap = fn.get_air_pollution(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
+    fn.store_air_pollution(ap)
+    cw = fn.get_current_weather(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
+    fn.store_current_weather(cw)
     e.add_events("PROGRAM END")
     e.close_log()
     db.close_dbs()

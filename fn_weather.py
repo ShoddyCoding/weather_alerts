@@ -2,6 +2,7 @@ import requests
 import json
 import eventlogger as er
 import datetime
+import dbconnections as db
 
 class forecastObj:
     def __init__(self, date_time, temp, feels_like, temp_min, temp_max, pressure, humidity, weather_keyword,
@@ -37,6 +38,7 @@ def get_current_weather(api, lat, long):
                                        lat=lat,
                                        long=long))
     current_weather_data = json.loads(current_weather.content.decode('utf-8'))
+    return current_weather_data
 
 def get_air_pollution(api, lat, long):
     """takes an api token, latitude, and longitude; returns the air pollution from openweather API"""
@@ -46,6 +48,44 @@ def get_air_pollution(api, lat, long):
                                        lat=lat,
                                        long=long))
     current_air_pollution = json.loads(air_pollution.content.decode('utf-8'))
+    return current_air_pollution
+
+def store_air_pollution(air_pollution_object):
+    """take an air pollution object and stores the data in MySQL database"""
+    
+def store_current_weather(dp):
+    """takes an currenty weather object and store the data in MySQL"""
+    try:
+        if "rain" in dp:
+            pit = forecastObj(dp["dt"], dp["main"]["temp"], dp["main"]["feels_like"], dp["main"]["temp_min"],
+                            dp["main"]["temp_max"],  dp["main"]["pressure"], dp["main"]["humidity"],
+                            dp["weather"][0]["main"], dp["weather"][0]["description"],dp["wind"]["speed"],
+                            dp["wind"]["deg"], 0, dp["clouds"]["all"], dp["visibility"], dp["rain"]["1h"])
+            query = "INSERT INTO `weather`.`weather_history` (`dt`, `temp`, `feel_like`, `temp_min`, \
+                `temp_max`, `pressure`, `humidity`, `weather_keyword`, `weather_description`, `wind_speed`, \
+                `wind_direction`, `clouds`, `visibility`, `rain`) \
+                VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}',\
+                '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}');".format(pit.dt, pit.t, pit.fl, pit.tmin, pit.tmax,
+                pit.p, pit.h, pit.wk, pit.wd, pit.w_s, pit.w_d, pit.c, pit.v, pit.r)          
+            db.conn_local_prod_cursor.execute(query)
+            er.add_events("ADDED - CURRENT WEATHER FORECAST WITH RAIN")
+        else:
+            pit = forecastObj(dp["dt"], dp["main"]["temp"], dp["main"]["feels_like"], dp["main"]["temp_min"],
+                            dp["main"]["temp_max"],  dp["main"]["pressure"], dp["main"]["humidity"],
+                            dp["weather"][0]["main"], dp["weather"][0]["description"],dp["wind"]["speed"],
+                            dp["wind"]["deg"], 0, dp["clouds"]["all"], dp["visibility"], 0)
+            query = "INSERT INTO `weather`.`weather_history` (`dt`, `temp`, `feel_like`, `temp_min`, \
+                `temp_max`, `pressure`, `humidity`, `weather_keyword`, `weather_description`, `wind_speed`, \
+                `wind_direction`, `clouds`, `visibility`) \
+                VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}',\
+                '{7}', '{8}', '{9}', '{10}', '{11}', '{12}');".format(pit.dt, pit.t, pit.fl, pit.tmin, pit.tmax,
+                pit.p, pit.h, pit.wk, pit.wd, pit.w_s, pit.w_d, pit.c, pit.v)  
+            db.conn_local_prod_cursor.execute(query)
+            er.add_events("ADDED - CURRENT WEATHER FORECAST WITHOUT RAIN")
+                
+                
+    except Exception as e:
+        er.add_events("ERROR: Issue converting datapoint into forecast object: {}".format(e.string))
 
 def get_weather_forecast(api, lat, long):
     """takes an api token, latitude, and longitude; returns the 
