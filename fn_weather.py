@@ -52,6 +52,21 @@ def get_air_pollution(api, lat, long):
 
 def store_air_pollution(air_pollution_object):
     """take an air pollution object and stores the data in MySQL database"""
+    try:
+        print(air_pollution_object["list"][0]["components"]["co"])
+        query = "INSERT INTO `weather`.`air_pollution` (`dt`, `main_air_quality_index`, \
+                `carbon_monoxide`, `nitrogen_monoxide`, `nitrogen_dioxide`, `ozone`, `sulphur_dioxide`, \
+                `fine_particulate`, `coarse_particulate`, `ammonia`) \
+                VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}');".format(
+                air_pollution_object["list"][0]["dt"], air_pollution_object["list"][0]["main"]["aqi"],
+                air_pollution_object["list"][0]["components"]["co"],air_pollution_object["list"][0]["components"]["no"],
+                air_pollution_object["list"][0]["components"]["no2"],air_pollution_object["list"][0]["components"]["o3"],
+                air_pollution_object["list"][0]["components"]["so2"],air_pollution_object["list"][0]["components"]["pm2_5"],
+                air_pollution_object["list"][0]["components"]["pm10"],air_pollution_object["list"][0]["components"]["nh3"]
+                )
+        db.conn_local_prod_cursor.execute(query)
+    except Exception as e:
+        er.add_events("ERROR: Issue converting datapoint into forecast object: {}".format(e.string))
     
 def store_current_weather(dp):
     """takes an currenty weather object and store the data in MySQL"""
@@ -68,7 +83,6 @@ def store_current_weather(dp):
                 '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}');".format(pit.dt, pit.t, pit.fl, pit.tmin, pit.tmax,
                 pit.p, pit.h, pit.wk, pit.wd, pit.w_s, pit.w_d, pit.c, pit.v, pit.r)          
             db.conn_local_prod_cursor.execute(query)
-            er.add_events("ADDED - CURRENT WEATHER FORECAST WITH RAIN")
         else:
             pit = forecastObj(dp["dt"], dp["main"]["temp"], dp["main"]["feels_like"], dp["main"]["temp_min"],
                             dp["main"]["temp_max"],  dp["main"]["pressure"], dp["main"]["humidity"],
@@ -81,7 +95,6 @@ def store_current_weather(dp):
                 '{7}', '{8}', '{9}', '{10}', '{11}', '{12}');".format(pit.dt, pit.t, pit.fl, pit.tmin, pit.tmax,
                 pit.p, pit.h, pit.wk, pit.wd, pit.w_s, pit.w_d, pit.c, pit.v)  
             db.conn_local_prod_cursor.execute(query)
-            er.add_events("ADDED - CURRENT WEATHER FORECAST WITHOUT RAIN")
                 
                 
     except Exception as e:
