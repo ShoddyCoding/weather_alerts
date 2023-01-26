@@ -19,7 +19,7 @@ def main():
     cw = fn.get_current_weather(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
     fn.store_current_weather(cw)
     fn.get_weather_forecast(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
-    d = datetime.datetime.utcnow()
+    d = datetime.datetime.now()
     if d.hour == 15:
         e.add_events("BEGIN - CHECK FOR FREEZING WEATHER EVENTS")
         forecasted_weather = fn.get_weather_forecast(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
