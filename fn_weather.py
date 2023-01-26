@@ -119,7 +119,6 @@ def get_weather_forecast(api, lat, long):
                     `clouds` = '{11}', `visibility`= '{12}', `rain` = '{13}';".format(pit.dt, pit.t, pit.fl, 
                     pit.tmin, pit.tmax, pit.p, pit.h, pit.wk, pit.wd, pit.w_s, pit.w_d, pit.c, pit.v, pit.r)          
                     db.conn_local_prod_cursor.execute(query)
-                    er.add_events("ADDED - FUTURE WEATHER FORECAST WITH RAIN")
                 else:
                     pit = forecastObj(dp["dt"], dp["main"]["temp"], dp["main"]["feels_like"], dp["main"]["temp_min"],
                                     dp["main"]["temp_max"],  dp["main"]["pressure"], dp["main"]["humidity"],
@@ -136,7 +135,6 @@ def get_weather_forecast(api, lat, long):
                     `clouds` = '{11}', `visibility`= '{12}';".format(pit.dt, pit.t, pit.fl, 
                     pit.tmin, pit.tmax, pit.p, pit.h, pit.wk, pit.wd, pit.w_s, pit.w_d, pit.c, pit.v)          
                     db.conn_local_prod_cursor.execute(query)
-                    er.add_events("ADDED - FUTURE WEATHER FORECAST WITHOUT RAIN")
                 next_150_hours.append(pit)
     except Exception as e:
         er.add_events("ERROR: Issue converting datapoint into forecast object: {}".format(e.string))

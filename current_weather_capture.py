@@ -4,6 +4,7 @@ import eventlogger as e
 import texting as t
 import os
 import dbconnections as db
+import datetime
 
 
 def main():
@@ -18,6 +19,17 @@ def main():
     cw = fn.get_current_weather(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
     fn.store_current_weather(cw)
     fn.get_weather_forecast(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
+    d = datetime.datetime.utcnow()
+    if d.hour == 15:
+        e.add_events("BEGIN - CHECK FOR FREEZING WEATHER EVENTS")
+        forecasted_weather = fn.get_weather_forecast(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
+        freezing_forecasted_condition = fn.have_Freezing_Conditions(forecasted_weather,config["FREEZINGCONDITIONS"]["TEMP"])
+        if freezing_forecasted_condition != False:
+            e.add_events("INFO - We have a freezing condition coming up! Condition: {}".format(freezing_forecasted_condition))
+            for recepient in config["RECEPIENTS"]["FREEZEALERTS"].split(","):
+                t.send_message(recepient, freezing_forecasted_condition)
+        else:
+            e.add_events("INFO: No Freezing Events Found")
     e.add_events("PROGRAM END")
     e.close_log()
     db.close_dbs()
