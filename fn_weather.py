@@ -57,7 +57,8 @@ def store_air_pollution(air_pollution_object):
         query = "INSERT INTO `weather`.`air_pollution` (`dt`, `main_air_quality_index`, \
                 `carbon_monoxide`, `nitrogen_monoxide`, `nitrogen_dioxide`, `ozone`, `sulphur_dioxide`, \
                 `fine_particulate`, `coarse_particulate`, `ammonia`) \
-                VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}');".format(
+                VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}') \
+                ON DUPLICATE KEY UPDATE `main_air_quality_index` = {1};".format(
                 air_pollution_object["list"][0]["dt"], air_pollution_object["list"][0]["main"]["aqi"],
                 air_pollution_object["list"][0]["components"]["co"],air_pollution_object["list"][0]["components"]["no"],
                 air_pollution_object["list"][0]["components"]["no2"],air_pollution_object["list"][0]["components"]["o3"],
