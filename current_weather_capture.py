@@ -30,7 +30,7 @@ def main():
                 t.send_message(recepient, freezing_forecasted_condition)
         else:
             e.add_events("INFO: No Freezing Events Found")
-    e.add_events("PROGRAM END")
+    u.remove_old_log_files("logs",30)
     e.close_log()
     db.close_dbs()
 
