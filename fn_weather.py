@@ -3,6 +3,8 @@ import json
 import eventlogger as er
 import datetime
 import dbconnections as db
+import utilities as u
+import os
 
 class forecastObj:
     def __init__(self, date_time, temp, feels_like, temp_min, temp_max, pressure, humidity, weather_keyword,
@@ -161,7 +163,7 @@ def have_Freezing_Conditions(forecast, temperature):
     now_dt = datetime.datetime.now()
     try:
         for i in forecast:
-            if i.t < temperature:
+            if i.t < temperature and (datetime.datetime.fromtimestamp(i.t) - now_dt).days == 0:
                 detection = detectionOjb(i.dt, i.t, i.wk, i.wd)
                 listOfDetections.append(detection)
         earlist_freezing_temp = find_lowest_value_in_forecast_condition(listOfDetections)
@@ -216,3 +218,11 @@ def format_weather_message(weather_obj, first_thaw):
         return weather_string
     except Exception as e:
         er.add_events("ERROR: Unable to convert weather object to string: {}".format(e.string))
+
+if __name__ == "__main__":
+    
+    __location__ = u.get_local_file_path()
+    config = u.read_json(os.path.join(__location__, 'config.json'))
+    forecasted_weather = get_weather_forecast(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
+    freezing_forecasted_condition = have_Freezing_Conditions(forecasted_weather,config["FREEZINGCONDITIONS"]["TEMP"])
+    
