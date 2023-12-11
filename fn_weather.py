@@ -156,19 +156,21 @@ def get_weather_forecast(api, lat, long):
         er.add_events("ERROR: Issue converting datapoint into forecast object: {}".format(e.string))
     return next_150_hours
 
-def have_Freezing_Conditions(forecast, temperature):
-    """Takes a list of 150 hours of forecast objects and evaluates for freezing conditions
+def have_Freezing_Conditions():
+    """Queries the database for a freezing event in the next 24 hours
      in the next 24 hours and returns a detection object if condition is found"""
-    listOfDetections = []
-    now_dt = datetime.datetime.now()
     try:
-        for i in forecast:
-            if i.t < temperature and (datetime.datetime.fromtimestamp(i.t) - now_dt).days == 0:
-                detection = detectionOjb(i.dt, i.t, i.wk, i.wd)
-                listOfDetections.append(detection)
-        earlist_freezing_temp = find_lowest_value_in_forecast_condition(listOfDetections)
-        if (datetime.datetime.fromtimestamp(earlist_freezing_temp.dt) - now_dt).days == 0:
-            first_thaw_after_freeze = find_first_nonfreezing_condition(earlist_freezing_temp, forecast)
+        query = "SELECT dt, temp,  weather_keyword, weather_description FROM weather.freezing_temps_in_next_24_hours_nearest_time;"
+        db.conn_local_prod_cursor.execute(query)
+        weather_event = db.conn_local_prod_cursor.fetchone()
+        if weather_event != None:
+            query2 = "SELECT dt FROM weather.next_thaw;"
+            db.conn_local_prod_cursor.execute(query2)
+            thaw = db.conn_local_prod_cursor.fetchone()
+            
+            earlist_freezing_temp = detectionOjb(weather_event[0], weather_event[1], weather_event[2], weather_event[3])
+            first_thaw_after_freeze = thaw[0]
+
             formatted_message = format_weather_message(earlist_freezing_temp, first_thaw_after_freeze)
             return formatted_message
         else:
@@ -209,7 +211,7 @@ def format_weather_message(weather_obj, first_thaw):
     try:
         time = datetime.datetime.fromtimestamp(weather_obj.dt)
         if first_thaw != False:
-            first_thaw_time = datetime.datetime.fromtimestamp(first_thaw.dt)
+            first_thaw_time = datetime.datetime.fromtimestamp(first_thaw)
         else:
             first_thaw_time = "Unknown, this is a long freeze"
         weather_string = "Freezing Conditions coming up at:" \
@@ -220,9 +222,12 @@ def format_weather_message(weather_obj, first_thaw):
         er.add_events("ERROR: Unable to convert weather object to string: {}".format(e.string))
 
 if __name__ == "__main__":
-    
     __location__ = u.get_local_file_path()
-    config = u.read_json(os.path.join(__location__, 'config.json'))
-    forecasted_weather = get_weather_forecast(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
-    freezing_forecasted_condition = have_Freezing_Conditions(forecasted_weather,config["FREEZINGCONDITIONS"]["TEMP"])
     
+    config = u.read_json(os.path.join(__location__, 'config.json'))
+    
+    db.setupdbs(config["MYSQL"]["HOSTNAME"],config["MYSQL"]["PORT"]
+            ,config["MYSQL"]["WEATHER_USERNAME"],config["MYSQL"]["WEATHER_PASS"])
+    #forecasted_weather = get_weather_forecast(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
+    freezing_forecasted_condition = have_Freezing_Conditions()
+    db.close_dbs()

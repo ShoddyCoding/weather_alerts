@@ -18,7 +18,7 @@ def main():
     if d.hour == 15:
         e.add_events("BEGIN - CHECK FOR FREEZING WEATHER EVENTS")
         forecasted_weather = fn.get_weather_forecast(config["WEATHER"]["OPENWEATHERAPI"],config["WEATHER"]["LAT"],config["WEATHER"]["LONG"])
-        freezing_forecasted_condition = fn.have_Freezing_Conditions(forecasted_weather,config["FREEZINGCONDITIONS"]["TEMP"])
+        freezing_forecasted_condition = fn.have_Freezing_Conditions()
         if freezing_forecasted_condition != False:
             e.add_events("INFO - We have a freezing condition coming up! Condition: {}".format(freezing_forecasted_condition))
             for recepient in config["RECEPIENTS"]["FREEZEALERTS"].split(","):
